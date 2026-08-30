@@ -3,8 +3,15 @@ from app.core.config import settings
 from app.services.hybrid_encoder import HybridEncoder
 from app.models.schema import UserRole
 
-pc = Pinecone(api_key=settings.PINECONE_API_KEY)
-index = pc.Index(settings.PINECONE_INDEX_NAME)
+pc = None
+_index = None
+
+def get_index():
+    global pc, _index
+    if _index is None:
+        pc = Pinecone(api_key=settings.PINECONE_API_KEY)
+        _index = pc.Index(settings.PINECONE_INDEX_NAME)
+    return _index
 
 class RetrievalService:
     @staticmethod
@@ -39,7 +46,7 @@ class RetrievalService:
             filter_dict["document_type"] = {"$eq": doc_type}
 
         # 4. Async Query Execution on Pinecone Namespace
-        response = index.query(
+        response = get_index().query(
             namespace="enterprise_docs",
             vector=scaled_dense,
             sparse_vector=scaled_sparse,

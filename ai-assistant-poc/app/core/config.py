@@ -23,6 +23,12 @@ class Settings(BaseSettings):
     PINECONE_INDEX_NAME: str = "enterprise-knowledge-base"
     PINECONE_ENVIRONMENT: Optional[str] = None
 
+    # LangSmith Observability
+    LANGCHAIN_TRACING_V2: str = "true"
+    LANGCHAIN_ENDPOINT: str = "https://api.smith.langchain.com"
+    LANGCHAIN_API_KEY: Optional[str] = None
+    LANGCHAIN_PROJECT: str = "enterprise-ai-assistant"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
