@@ -1,4 +1,4 @@
-# pyrefly: ignore [missing-import]
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
@@ -24,6 +24,11 @@ class Settings(BaseSettings):
     PINECONE_ENVIRONMENT: Optional[str] = None
 
     # LangSmith Observability
+    LANGSMITH_TRACING: str = "true"
+    LANGSMITH_ENDPOINT: str = "https://api.smith.langchain.com"
+    LANGSMITH_API_KEY: Optional[str] = None
+    LANGSMITH_PROJECT: str = "enterprise-ai-assistant"
+
     LANGCHAIN_TRACING_V2: str = "true"
     LANGCHAIN_ENDPOINT: str = "https://api.smith.langchain.com"
     LANGCHAIN_API_KEY: Optional[str] = None
@@ -36,3 +41,22 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+# Synchronize settings into os.environ for LangChain and LangSmith automatic tracing
+api_key = settings.LANGSMITH_API_KEY or settings.LANGCHAIN_API_KEY
+project_name = settings.LANGSMITH_PROJECT or settings.LANGCHAIN_PROJECT or "enterprise-ai-assistant"
+endpoint = settings.LANGSMITH_ENDPOINT or settings.LANGCHAIN_ENDPOINT or "https://api.smith.langchain.com"
+
+if api_key:
+    os.environ["LANGSMITH_API_KEY"] = api_key
+    os.environ["LANGCHAIN_API_KEY"] = api_key
+
+os.environ["LANGSMITH_TRACING"] = settings.LANGSMITH_TRACING or settings.LANGCHAIN_TRACING_V2 or "true"
+os.environ["LANGCHAIN_TRACING_V2"] = os.environ["LANGSMITH_TRACING"]
+os.environ["LANGSMITH_ENDPOINT"] = endpoint
+os.environ["LANGCHAIN_ENDPOINT"] = endpoint
+os.environ["LANGSMITH_PROJECT"] = project_name
+os.environ["LANGCHAIN_PROJECT"] = project_name
+
+if settings.OPENAI_API_KEY:
+    os.environ["OPENAI_API_KEY"] = settings.OPENAI_API_KEY

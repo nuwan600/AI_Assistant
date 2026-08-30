@@ -1,6 +1,7 @@
 import json
 import asyncio
 import structlog
+from langsmith import traceable
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import SystemMessage, HumanMessage
 from app.core.config import settings
@@ -12,6 +13,7 @@ logger = structlog.get_logger()
 llm = ChatOpenAI(model="gpt-4o-mini", api_key=settings.OPENAI_API_KEY, temperature=0, request_timeout=10)
 
 # --- 1. SUPERVISOR AGENT WITH GUARDRAILS ---
+@traceable(name="supervisor_node", run_type="chain")
 async def supervisor_node(state: AgentState) -> dict:
     user_query = state["messages"][-1]["content"]
     
@@ -43,6 +45,7 @@ async def supervisor_node(state: AgentState) -> dict:
     return {"next_node": next_node}
 
 # --- 2. RETRIEVAL AGENT WITH DEGRADATION ---
+@traceable(name="retrieval_node", run_type="chain")
 async def retrieval_node(state: AgentState) -> dict:
     user_query = state["messages"][-1]["content"]
     user_role = state["user_role"]
@@ -63,6 +66,7 @@ async def retrieval_node(state: AgentState) -> dict:
     return {"retrieved_docs": docs, "next_node": "response"}
 
 # --- 3. RESEARCH AGENT (RLM) WITH FALLBACK ---
+@traceable(name="research_node", run_type="chain")
 async def research_node(state: AgentState) -> dict:
     user_query = state["messages"][-1]["content"]
     user_role = state["user_role"]
@@ -92,6 +96,7 @@ async def research_node(state: AgentState) -> dict:
     return {"research_batches": batch_results, "next_node": "response"}
 
 # --- 4. RESPONSE AGENT WITH CITATION GUARDRAIL ---
+@traceable(name="response_node", run_type="chain")
 async def response_node(state: AgentState) -> dict:
     messages = state["messages"]
     docs = state.get("retrieved_docs", [])

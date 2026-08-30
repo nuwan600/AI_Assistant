@@ -1,5 +1,6 @@
 import re
 from fastapi import HTTPException, status
+from langsmith import traceable
 
 # Prompt Injection Attack Patterns
 INJECTION_PATTERNS = [
@@ -15,6 +16,7 @@ INJECTION_PATTERNS = [
 
 class GuardrailService:
     @staticmethod
+    @traceable(name="GuardrailService.validate_user_input", run_type="parser")
     def validate_user_input(query: str) -> str:
         """Checks for common prompt injection patterns and sanitizes inputs."""
         cleaned_query = query.strip()
@@ -35,6 +37,7 @@ class GuardrailService:
         return cleaned_query
 
     @staticmethod
+    @traceable(name="GuardrailService.validate_output_citations", run_type="parser")
     def validate_output_citations(response_text: str, available_docs: list[dict]) -> str:
         """Prevents hallucinated citations by verifying returned document IDs against retrieved contexts."""
         valid_doc_ids = {doc.get("document_id") for doc in available_docs if doc.get("document_id")}

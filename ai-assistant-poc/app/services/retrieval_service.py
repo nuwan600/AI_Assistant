@@ -1,4 +1,5 @@
 from pinecone import Pinecone
+from langsmith import traceable
 from app.core.config import settings
 from app.services.hybrid_encoder import HybridEncoder
 from app.models.schema import UserRole
@@ -15,6 +16,7 @@ def get_index():
 
 class RetrievalService:
     @staticmethod
+    @traceable(name="RetrievalService.hybrid_search", run_type="retriever")
     async def hybrid_search(
         query: str,
         user_role: UserRole,
