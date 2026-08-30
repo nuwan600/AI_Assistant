@@ -1,0 +1,38 @@
+[
+  {
+    "id": "doc_001",
+    "title": "Payment Gateway Infrastructure Runbook",
+    "department": "payments",
+    "document_type": "runbook",
+    "access_level": "internal",
+    "created_date": "2025-01-15",
+    "content": "In case of payment gateway timeouts (HTTP 504), check the Redis cache connection pool. Restart the payment-service pod using 'kubectl rollout restart deployment/payment-service'. If error rates exceed 5%, trigger incident management protocol."
+  },
+  {
+    "id": "doc_002",
+    "title": "INC-2025-089 Payment Timeout Outage Report",
+    "department": "payments",
+    "document_type": "incident",
+    "access_level": "internal",
+    "created_date": "2025-02-10",
+    "content": "Incident INC-2025-089: Payment failures observed during high-traffic promotional events. Root Cause: Connection pool exhaustion in the primary database combined with Third-Party Payment Gateway HTTP 504 responses. Solution: Scaled database pool size and implemented circuit breaker pattern."
+  },
+  {
+    "id": "doc_003",
+    "title": "Commercial Banking Core Security Policy",
+    "department": "security",
+    "document_type": "policy",
+    "access_level": "confidential",
+    "created_date": "2025-01-01",
+    "content": "All customer payment data must be encrypted at rest using AES-256 and in transit via TLS 1.3. Administrative tools must require multi-factor authentication (MFA) and strict Role-Based Access Control (RBAC)."
+  },
+  {
+    "id": "doc_004",
+    "title": "System Architecture - User Authentication Service",
+    "department": "engineering",
+    "document_type": "architecture",
+    "access_level": "public",
+    "created_date": "2024-11-20",
+    "content": "The Auth Service uses OAuth2 with JWT tokens for stateless authorization. Rate limiting is enforced via Token Bucket algorithm at 20 requests per minute per user."
+  }
+]

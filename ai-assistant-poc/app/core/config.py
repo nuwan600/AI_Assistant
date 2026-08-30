@@ -1,7 +1,6 @@
-
 # pyrefly: ignore [missing-import]
-from pydantic_settings import BaseSettings
-from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Optional
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "Enterprise AI Assistant"
@@ -14,7 +13,20 @@ class Settings(BaseSettings):
     RATE_LIMIT_TOKENS: int = 20
     RATE_LIMIT_FILL_RATE: float = 1.0  # Tokens per second
 
-    class Config:
-        env_file = ".env"
+    # OpenAI & Embedding Config
+    OPENAI_API_KEY: str = ""
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
+    EMBEDDING_DIMENSION: int = 1536
+
+    # Pinecone Vector DB Config
+    PINECONE_API_KEY: str = ""
+    PINECONE_INDEX_NAME: str = "enterprise-knowledge-base"
+    PINECONE_ENVIRONMENT: Optional[str] = None
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 settings = Settings()
